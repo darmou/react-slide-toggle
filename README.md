@@ -37,7 +37,7 @@ Look in App component for inspiration. Apply the styling as needed.
 ### component example, simple - render prop
 
 ```js
-import useSliderToggle from "react-slide-toggle";
+import useSliderToggle from "react-slide-toggle-hooks";
 // or
 // const useSliderToggle = require("react-slide-toggle");
 
@@ -59,7 +59,7 @@ return (
 ### component example, simple - function as child
 
 ```js
-import useSliderToggle from "react-slide-toggle";
+import useSliderToggle from "react-slide-toggle-hooks";
 
 // Apply optional padding to .my-collapsible__content-inner
 const { toggle, setCollapsibleElement } = useSliderToggle();
@@ -79,7 +79,7 @@ return (
 ### toggle state from outside example
 
 ```js
-import useSliderToggle from "react-slide-toggle";
+import useSliderToggle from "react-slide-toggle-hooks";
 
 function MyComponent = () => {
   state = { toggleEvent: 0 };
@@ -115,7 +115,7 @@ function MyComponent = () => {
 ### component usage example with all options
 
 ```js
-import useSliderToggle from "react-slide-toggle";
+import useSliderToggle from "react-slide-toggle-hooks";
 import BezierEasing from "bezier-easing"; // optional
 
 const bezierEaseInOutQuart = BezierEasing(0.77, 0, 0.175, 1);
