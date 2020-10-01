@@ -19,6 +19,7 @@
     "rebuild-node-sass": "npm rebuild node-sass",
     "source-map": "source-map-explorer dist/Collapse.js"
   },
+  "publishConfig": { "registry": "https://npm.pkg.github.com/" },
   "description": "React component version of jQuery.slideToggle",
   "main": "dist/ReactSlideToggle.umd.js",
   "module": "dist/ReactSlideToggle.esm.es2015.js",
