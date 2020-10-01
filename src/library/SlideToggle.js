@@ -53,125 +53,169 @@ const util = {
   },
 };
 
-export default class SlideToggle extends React.Component {
-  static defaultProps = {
-    duration: 300,
-    easeCollapse: easeInOutCubic,
-    easeExpand: easeInOutCubic,
-  };
+export const useSlideToggle = ({interpolateOnReverse = false,
+                                 onCollapsed = null, onUnmount = null,
+                                 toggleEvent = null, expandEvent = null,
+                                 collapseEvent = null, onMount = null,
+                                 bestPerformance = true,
+                                 whenReversedUseBackwardEase = null,
+                                 noDisplayStyle = false, onExpanding = null,
+                                 onCollapsing = null, onExpanded = null,
+                                 noOverflowHidden = true,
+                                 offsetHeight = false,
+                                 irreversible = false, collapsed = false, duration = 300,
+                                 easeCollapse = easeInOutCubic,
+                                 easeExpand = easeInOutCubic}) => {
 
   // Internal state
-  _state_ = {
+  let _state_ = {
     collapsibleElement: null,
-    toggleState: this.props.collapsed ? TOGGLE.COLLAPSED : TOGGLE.EXPANDED,
+    toggleState: collapsed ? TOGGLE.COLLAPSED : TOGGLE.EXPANDED,
   };
 
-  GET_HEIGHT = this.props.offsetHeight ? 'offsetHeight' : 'scrollHeight';
-
-  // React state
-  state = {
-    toggleState: this._state_.toggleState,
+  const [slideToggleState, setSlideToggleState] = React.useState({
+    toggleState: _state_.toggleState,
     hasReversed: false,
-    range: this.props.collapsed ? 0 : 1,
-    progress: this.props.collapsed ? 0 : 1,
-  };
+    range: collapsed ? 0 : 1,
+    progress: collapsed ? 0 : 1,
+  });
 
-  render() {
-    const data = {
-      onToggle: this.toggle, // deprecated
-      toggle: this.toggle,
-      setCollapsibleElement: this.setCollapsibleElement,
-      toggleState: this.state.toggleState,
-      hasReversed: this.state.hasReversed,
-      isMoving: util.isMoving(this.state.toggleState),
-      range: this.state.range,
-      progress: this.state.progress,
-    };
+  const didMountRef = React.useRef(false);
+  const prevCollapseEvent = React.useRef();
+  const prevExpandEvent = React.useRef();
+  const prevToggleEvent = React.useRef();
 
-    if (typeof this.props.children === 'function')
-      return this.props.children(data);
-    if (this.props.render) return this.props.render(data);
+  React.useEffect(() => {
+    prevCollapseEvent.current = collapseEvent;
+    prevExpandEvent.current = expandEvent;
+    prevToggleEvent.current = toggleEvent;
 
-    return this.props.children;
-  }
+    // code to run on component mount
+    onMount &&
+    onMount({
+      toggleState: slideToggleState.toggleState,
+      toggle: slideToggleState.toggle,
+    });
+    if (didMountRef.current) {
+      if (
+          collapseEvent &&
+          collapseEvent > prevExpandEvent.current
+      ) {
+        if (
+            _state_.toggleState === TOGGLE.EXPANDED ||
+            _state_.toggleState === TOGGLE.EXPANDING
+        ) {
+          toggle();
+        }
+      }
+      if (
+          expandEvent &&
+          expandEvent > prevExpandEvent.current
+      ) {
+        if (
+            _state_.toggleState === TOGGLE.COLLAPSED ||
+            _state_.toggleState === TOGGLE.COLLAPSING
+        ) {
+          toggle();
+        }
+      }
+      if (
+          toggleEvent &&
+          toggleEvent > prevToggleEvent.current
+      ) {
+        toggle();
+      }
+    } else didMountRef.current = true
 
-  getCollapsible = () => this._state_.collapsibleElement;
+    return function cleanup() {
+      onUnmount &&
+      onUnmount({
+        toggleState: slideToggleState.toggleState,
+      });
+      _state_.timeout && cAF(_state_.timeout);
+    }
 
-  updateCollapsible = (attr, value) => {
-    if (this.getCollapsible()) {
-      this._state_.collapsibleElement.style[attr] = value;
+  }, [slideToggleState, onMount, didMountRef, expandEvent, collapseEvent, toggleEvent]);
+
+
+  const GET_HEIGHT = offsetHeight ? 'offsetHeight' : 'scrollHeight';
+
+  const getCollapsible = () => _state_.collapsibleElement;
+
+  const updateCollapsible = (attr, value) => {
+    if (getCollapsible()) {
+      _state_.collapsibleElement.style[attr] = value;
     }
   };
 
-  setCollapsibleElement = element => {
-    this._state_.collapsibleElement = element;
-    if (this._state_.collapsibleElement && !this.props.noOverflowHidden) {
-      this._state_.collapsibleElement.style.overflow = 'hidden';
+  const setCollapsibleElement = element => {
+    _state_.collapsibleElement = element;
+    if (_state_.collapsibleElement && !noOverflowHidden) {
+      _state_.collapsibleElement.style.overflow = 'hidden';
     }
-    if (this._state_.toggleState === TOGGLE.COLLAPSED) {
-      this.setCollapsedState({ initialState: true });
+    if (_state_.toggleState === TOGGLE.COLLAPSED) {
+      setCollapsedState({ initialState: true });
     }
   };
 
-  toggle = () => {
-    if (this.props.irreversible && util.isMoving(this._state_.toggleState)) {
+  const toggle = () => {
+    if (irreversible && util.isMoving(_state_.toggleState)) {
       return;
     }
 
     const invokeCollapsing = () => {
-      this.props.onCollapsing &&
-        this.props.onCollapsing({
-          range: this.state.range,
-          progress: this.state.progress,
-          hasReversed: this.state.hasReversed,
-        });
+      onCollapsing &&
+      onCollapsing({
+        range: slideToggleState.range,
+        progress: slideToggleState.progress,
+        hasReversed: slideToggleState.hasReversed,
+      });
 
-      this.collapse();
+      collapse();
     };
     const invokeExpanding = () => {
-      this.props.onExpanding &&
-        this.props.onExpanding({
-          range: this.state.range,
-          progress: this.state.progress,
-          hasReversed: this.state.hasReversed,
-        });
+      onExpanding &&
+      onExpanding({
+        range: slideToggleState.range,
+        progress: slideToggleState.progress,
+        hasReversed: slideToggleState.hasReversed,
+      });
 
-      this.expand();
+      expand();
     };
 
     const updateInternalState = ({ toggleState, display, hasReversed }) => {
-      this._state_.toggleState = toggleState;
-      this._state_.hasReversed = !!hasReversed;
+      _state_.toggleState = toggleState;
+      _state_.hasReversed = !!hasReversed;
 
-      if (display !== undefined && !this.props.noDisplayStyle) {
-        this.updateCollapsible('display', display);
+      if (display !== undefined && !noDisplayStyle) {
+        updateCollapsible('display', display);
       }
 
       const now = util.now();
 
       if (hasReversed) {
-        const { startTime } = this._state_;
-        const duration = util.sanitizeDuration(this.props.duration);
+        const { startTime } = _state_;
+        const duration = util.sanitizeDuration(duration);
         const elapsedTime = Math.min(duration, now - startTime);
         const subtract = Math.max(0, duration - elapsedTime);
-        this._state_.startTime = now - subtract;
+        _state_.startTime = now - subtract;
       } else {
-        const collapsible = this.getCollapsible();
+        const collapsible = getCollapsible();
         if (collapsible && collapsible.style.height) {
-          this.updateCollapsible('height', null);
+          updateCollapsible('height', null);
         }
-        this._state_.boxHeight = collapsible ? collapsible[this.GET_HEIGHT] : 0;
-        this._state_.startTime = now;
-        this._state_.startDirection = toggleState;
+        _state_.boxHeight = collapsible ? collapsible[GET_HEIGHT] : 0;
+        _state_.startTime = now;
+        _state_.startDirection = toggleState;
       }
 
-      this.setState({
-        toggleState: this._state_.toggleState,
-        hasReversed: this._state_.hasReversed,
+      setSlideToggleState({...slideToggleState,
+        toggleState: _state_.toggleState, hasReversed: _state_.hasReversed
       });
     };
 
-    switch (this._state_.toggleState) {
+    switch (_state_.toggleState) {
       case TOGGLE.EXPANDED:
         updateInternalState({ toggleState: TOGGLE.COLLAPSING });
         invokeCollapsing();
@@ -201,119 +245,104 @@ export default class SlideToggle extends React.Component {
     }
   };
 
-  setExpandedState = () => {
-    this._state_.progress = 1;
-    this._state_.toggleState = TOGGLE.EXPANDED;
-    this.updateCollapsible('height', null);
-    this.setState({
-      toggleState: TOGGLE.EXPANDED,
-      range: 1,
-      progress: this._state_.progress,
-    });
-    if (this.props.onExpanded) {
-      this.props.onExpanded({
-        hasReversed: this.state.hasReversed,
+  const setExpandedState = () => {
+    _state_.progress = 1;
+    _state_.toggleState = TOGGLE.EXPANDED;
+    updateCollapsible('height', null);
+
+    setSlideToggleState({...slideToggleState, toggleState: TOGGLE.EXPANDED, range: 1, progress: _state_.progress});
+    if (onExpanded) {
+      onExpanded({
+        hasReversed: slideToggleState.hasReversed,
       });
     }
   };
 
-  expand = () => {
-    if (this._state_.toggleState !== TOGGLE.EXPANDING) {
+  const expand = () => {
+    if (_state_.toggleState !== TOGGLE.EXPANDING) {
       return;
     }
 
-    const duration = util.sanitizeDuration(this.props.duration);
+    const duration = util.sanitizeDuration(duration);
     if (duration <= 0) {
-      this.setExpandedState();
+      setExpandedState();
       return;
     }
 
-    const { startTime } = this._state_;
+    const { startTime } = _state_;
     const elapsedTime = Math.min(duration, util.now() - startTime);
 
     if (elapsedTime >= duration) {
-      this.setExpandedState();
+      setExpandedState();
     } else {
-      const { startDirection, toggleState, boxHeight } = this._state_;
+      const { startDirection, toggleState, boxHeight } = _state_;
       const range = util.clamp({ value: elapsedTime / duration });
 
       let progress;
       if (
-        this.props.whenReversedUseBackwardEase &&
-        startDirection !== toggleState
+          whenReversedUseBackwardEase &&
+          startDirection !== toggleState
       ) {
-        progress = 1 - this.props.easeCollapse(1 - range);
+        progress = 1 - easeCollapse(1 - range);
       } else {
-        progress = this.props.easeExpand(range);
+        progress = easeExpand(range);
       }
 
-      if (!this.props.bestPerformance) {
-        this.setState({
-          range,
-          progress,
-        });
+      if (!bestPerformance) {
+        setSlideToggleState({...slideToggleState, range, progress});
       }
 
-      if (this.props.interpolateOnReverse && this._state_.hasReversed) {
+      if (interpolateOnReverse && _state_.hasReversed) {
         progress = util.interpolate({
           next: progress,
-          prev: this._state_.progress,
+          prev: _state_.progress,
         });
       }
 
       const currentHeightValue = Math.round(boxHeight * progress);
-      this._state_.progress = progress;
-      this.updateCollapsible('height', `${currentHeightValue}px`);
-      this.nextTick(this.expand);
+      _state_.progress = progress;
+      updateCollapsible('height', `${currentHeightValue}px`);
+      nextTick(expand);
     }
   };
 
-  setCollapsedState = ({ initialState } = {}) => {
-    this._state_.progress = 0;
-    this._state_.toggleState = TOGGLE.COLLAPSED;
+  const setCollapsedState = ({ initialState } = {}) => {
+    _state_.progress = 0;
+    _state_.toggleState = TOGGLE.COLLAPSED;
 
-    if (!this.props.noDisplayStyle) {
-      this.updateCollapsible('display', 'none');
-      this.updateCollapsible('height', null);
+    if (!noDisplayStyle) {
+      updateCollapsible('display', 'none');
+      updateCollapsible('height', null);
     } else {
-      this.updateCollapsible('height', '0px');
+      updateCollapsible('height', '0px');
     }
 
-    this.setState({
-      toggleState: TOGGLE.COLLAPSED,
-      range: 0,
-      progress: this._state_.progress,
-    });
-    if (!initialState && this.props.onCollapsed)
-      this.props.onCollapsed({
-        hasReversed: this.state.hasReversed,
+    setSlideToggleState({...slideToggleState, toggleState: TOGGLE.COLLAPSED, range: 0, progress: _state_.progress});
+
+    if (!initialState && onCollapsed)
+      onCollapsed({
+        hasReversed: slideToggleState.hasReversed,
       });
   };
 
-  collapse = () => {
-    if (this._state_.toggleState !== TOGGLE.COLLAPSING) {
+  const collapse = () => {
+    if (_state_.toggleState !== TOGGLE.COLLAPSING) {
       return;
     }
-    const duration = util.sanitizeDuration(this.props.duration);
+    const duration = util.sanitizeDuration(duration);
     if (duration <= 0) {
-      this.setCollapsedState();
+      setCollapsedState();
       return;
     }
 
-    const { startTime } = this._state_;
+    const { startTime } = _state_;
     const elapsedTime = Math.min(duration, util.now() - startTime);
 
     if (elapsedTime >= duration) {
-      this.setCollapsedState();
+      setCollapsedState();
     } else {
-      const { startDirection, boxHeight, toggleState } = this._state_;
+      const { startDirection, boxHeight, toggleState } = _state_;
       const range = 1 - util.clamp({ value: elapsedTime / duration });
-
-      const {
-        whenReversedUseBackwardEase,
-        easeExpand,
-        easeCollapse,
-      } = this.props;
 
       let progress;
       if (whenReversedUseBackwardEase && startDirection !== toggleState) {
@@ -322,78 +351,32 @@ export default class SlideToggle extends React.Component {
         progress = 1 - easeCollapse(1 - range);
       }
 
-      if (!this.props.bestPerformance) {
-        this.setState({
-          range,
-          progress,
-        });
+      if (!bestPerformance) {
+        setSlideToggleState({...slideToggleState, range, progress });
       }
 
-      if (this.props.interpolateOnReverse && this._state_.hasReversed) {
+      if (interpolateOnReverse && _state_.hasReversed) {
         progress = util.interpolate({
           next: progress,
-          prev: this._state_.progress,
+          prev: _state_.progress,
         });
       }
 
       const currentHeightValue = Math.round(boxHeight * progress);
-      this._state_.progress = progress;
-      this._state_.timeout = this.nextTick(this.collapse);
-      this.updateCollapsible('height', `${currentHeightValue}px`);
+      _state_.progress = progress;
+      _state_.timeout = nextTick(collapse);
+      updateCollapsible('height', `${currentHeightValue}px`);
     }
   };
 
-  nextTick = callback => {
-    this._state_.timeout = rAF(callback);
+  const nextTick = callback => {
+    _state_.timeout = rAF(callback);
   };
 
-  componentDidMount() {
-    this.props.onMount &&
-      this.props.onMount({
-        toggleState: this.state.toggleState,
-        toggle: this.toggle,
-      });
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (
-      this.props.collapseEvent &&
-      this.props.collapseEvent > prevProps.collapseEvent
-    ) {
-      if (
-        this._state_.toggleState === TOGGLE.EXPANDED ||
-        this._state_.toggleState === TOGGLE.EXPANDING
-      ) {
-        this.toggle();
-      }
-    }
-    if (
-      this.props.expandEvent &&
-      this.props.expandEvent > prevProps.expandEvent
-    ) {
-      if (
-        this._state_.toggleState === TOGGLE.COLLAPSED ||
-        this._state_.toggleState === TOGGLE.COLLAPSING
-      ) {
-        this.toggle();
-      }
-    }
-    if (
-      this.props.toggleEvent &&
-      this.props.toggleEvent > prevProps.toggleEvent
-    ) {
-      this.toggle();
-    }
-  }
-
-  componentWillUnmount() {
-    this.props.onUnmount &&
-      this.props.onUnmount({
-        toggleState: this.state.toggleState,
-      });
-    this._state_.timeout && cAF(this._state_.timeout);
-  }
+  return { toggle, setCollapsibleElement, toggleEvent, slideToggleState }
 }
+
+
 
 // SlideToggle.propTypes = {
 //   render: PropTypes.func,

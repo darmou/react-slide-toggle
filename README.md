@@ -1,19 +1,16 @@
 ## about
 
+Origonal version here: https://github.com/kunukn/react-slide-toggle
+Altered for React hooks by Daryl Moulder https://github.com/darmou/react-slide-toggle
 React version of jQuery.slideToggle. JavaScript animation where height is set on every requestAnimationFrame.
 The toggle direction can be reversed during the movement.
-
-[![npm version](https://img.shields.io/npm/v/react-slide-toggle.svg?style=flat-square)](https://www.npmjs.com/package/react-slide-toggle)
-[![npm downloads](https://img.shields.io/npm/dm/react-slide-toggle.svg?style=flat-square)](https://www.npmjs.com/package/react-slide-toggle)
-[![gzip](https://img.shields.io/bundlephobia/minzip/react-slide-toggle.svg)](https://bundlephobia.com/result?p=react-slide-toggle)
-[![license](https://img.shields.io/github/license/kunukn/react-slide-toggle.svg)](https://github.com/kunukn/react-slide-toggle/blob/master/LICENSE)
 
 If you are looking for a CSS transition based alternative, then use this instead
 https://github.com/kunukn/react-collapse
 
 ## Supported React versions
 
-- React version 16.0+
+- React version 16.7+
 
 ## demo
 
@@ -45,13 +42,14 @@ Look in App component for inspiration. Apply the styling as needed.
 ### component example, simple - render prop
 
 ```js
-import SlideToggle from "react-slide-toggle";
+import useSliderToggle from "react-slide-toggle";
 // or
-// const SlideToggle = require("react-slide-toggle");
+// const useSliderToggle = require("react-slide-toggle");
 
 // Apply optional padding to .my-collapsible__content-inner
-<SlideToggle
-  render={({ toggle, setCollapsibleElement }) => (
+const { toggle, setCollapsibleElement } = useSliderToggle();
+
+return (
     <div className="my-collapsible">
       <button className="my-collapsible__toggle" onClick={toggle}>
         toggle
@@ -60,18 +58,18 @@ import SlideToggle from "react-slide-toggle";
         <div className="my-collapsible__content-inner">Collapsible content</div>
       </div>
     </div>
-  )}
-/>;
+);
 ```
 
 ### component example, simple - function as child
 
 ```js
-import SlideToggle from "react-slide-toggle";
+import useSliderToggle from "react-slide-toggle";
 
 // Apply optional padding to .my-collapsible__content-inner
-<SlideToggle>
-  {({ toggle, setCollapsibleElement }) => (
+const { toggle, setCollapsibleElement } = useSliderToggle();
+
+return (
     <div className="my-collapsible">
       <button className="my-collapsible__toggle" onClick={toggle}>
         toggle
@@ -80,42 +78,39 @@ import SlideToggle from "react-slide-toggle";
         <div className="my-collapsible__content-inner">Collapsible content</div>
       </div>
     </div>
-  )}
-</SlideToggle>;
+);
 ```
 
 ### toggle state from outside example
 
 ```js
-import SlideToggle from "react-slide-toggle";
+import useSliderToggle from "react-slide-toggle";
 
-class MyComponent extends React.Component {
+function MyComponent = () => {
   state = { toggleEvent: 0 };
 
   onToggle = () => {
     this.setState({ toggleEvent: Date.now() });
   };
 
-  render() {
+  const { setCollapsibleElement } = useSliderToggle({toggleEvent: onToggle});
+
+  return {
     return (
       <div>
         <button className="toggle" onClick={this.onToggle}>
           Toggle
         </button>
-        <SlideToggle toggleEvent={this.state.toggleEvent}>
-          {({ setCollapsibleElement }) => (
-            <div className="my-collapsible">
-              <div
-                className="my-collapsible__content"
-                ref={setCollapsibleElement}
-              >
-                <div className="my-collapsible__content-inner">
-                  Collapsible content
-                </div>
-              </div>
+        <div className="my-collapsible">
+          <div
+            className="my-collapsible__content"
+            ref={setCollapsibleElement}
+          >
+            <div className="my-collapsible__content-inner">
+              Collapsible content
             </div>
-          )}
-        </SlideToggle>
+          </div>
+        </div>
       </div>
     );
   }
@@ -125,23 +120,23 @@ class MyComponent extends React.Component {
 ### component usage example with all options
 
 ```js
-import SlideToggle from "react-slide-toggle";
+import useSliderToggle from "react-slide-toggle";
 import BezierEasing from "bezier-easing"; // optional
 
 const bezierEaseInOutQuart = BezierEasing(0.77, 0, 0.175, 1);
 
-<SlideToggle
-  duration={280 /* default 300 */}
-  easeCollapse={bezierEaseInOutQuart /* default cubicInOut */}
-  easeExpand={bezierEaseInOutQuart /* default cubicInOut */}
-  collapsed /* default falsy */
-  irreversible /* default falsy */
-  noDisplayStyle /* default falsy */
-  noOverflowHidden /* default falsy */
-  bestPerformance /* default falsy */
-  whenReversedUseBackwardEase /* default falsy */
-  interpolateOnReverse /* default falsy */
-  offsetHeight /* default scrollHeight */
+const { toggle, setCollapsibleElement, slideToggleState } = useSliderToggle({
+  duration:280, /* default 300 */}
+  easeCollapse:bezierEaseInOutQuart, /* default cubicInOut */}
+  easeExpand:bezierEaseInOutQuart, /* default cubicInOut */}
+  collapsed, /* default falsy */
+  irreversible, /* default falsy */,
+  noDisplayStyle, /* default falsy */,
+  noOverflowHidden, /* default falsy */
+  bestPerformance, /* default falsy */
+  whenReversedUseBackwardEase, /* default falsy */
+  interpolateOnReverse, /* default falsy */
+  offsetHeight, /* default scrollHeight */
   onExpanded={({ hasReversed }) => {
     /* optional event hook */
   }}
@@ -160,24 +155,11 @@ const bezierEaseInOutQuart = BezierEasing(0.77, 0, 0.175, 1);
   onUnmount={({ toggleState }) => {
     /* optional event hook */
   }}
-  expandEvent /* default undefined */
-  collapseEvent /* default undefined */
-  toggleEvent /* default undefined */
-  render={({
-    toggle,
-    setCollapsibleElement,
-    toggleState,
-    isMoving,
-    hasReversed,
-    range /* linear value between [0 and 1] */,
-    progress /* easing result value between [0 and 1] */
-  }) => {
-    /* optional logic here */
+  expandEvent, /* default undefined */
+  collapseEvent, /* default undefined */
+  toggleEvent
+   );
 
-    /*
-      markup example
-      where setCollapsibleElement, toggle and progress are used
-    */
     return (
       <div className="slide-toggle">
         <div className="slide-toggle__header">
@@ -194,9 +176,7 @@ const bezierEaseInOutQuart = BezierEasing(0.77, 0, 0.175, 1);
           </div>
         </div>
       </div>
-    );
-  }}
-/>;
+);
 ```
 
 ## properties
@@ -238,7 +218,7 @@ https://unpkg.com/react-slide-toggle/
 
 ## npm
 
-https://www.npmjs.com/package/react-slide-toggle
+https://www.npmjs.com/package/react-slide-toggle-hooks
 
 ## provide your own markup
 
