@@ -1,6 +1,6 @@
 {
-  "name": "react-slide-toggle",
-  "version": "0.3.5",
+  "name": "react-slide-toggle-hooks",
+  "version": "0.0.1",
   "engines": {
     "node": ">=10",
     "npm": ">=6"
@@ -23,7 +23,7 @@
   "main": "dist/ReactSlideToggle.umd.js",
   "module": "dist/ReactSlideToggle.esm.es2015.js",
   "cjs": "dist/ReactSlideToggle.cjs.js",
-  "author": "kunukn",
+  "author": "kunukn, modified by darmou",
   "license": "MIT",
   "files": [
     "dist"
@@ -107,7 +107,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kunukn/react-slide-toggle.git"
+    "url": "git+https://github.com/darmou/react-slide-toggle.git"
   },
   "keywords": [
     "slide",
@@ -115,7 +115,7 @@
     "collapsible"
   ],
   "bugs": {
-    "url": "https://github.com/kunukn/react-slide-toggle/issues"
+    "url": "https://github.com/darmou/react-slide-toggle/issues"
   },
-  "homepage": "https://github.com/kunukn/react-slide-toggle#readme"
+  "homepage": "https://github.com/darmou/react-slide-toggle#readme"
 }
