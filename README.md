@@ -12,11 +12,6 @@ https://github.com/kunukn/react-collapse
 
 - React version 16.7+
 
-## demo
-
-- https://codepen.io/kunukn/full/wpepGz/ - cdn example
-- https://codesandbox.io/s/react-slide-toggle-y3tpn - npm example
-
 ## size
 
 - UMD minified size ~7.8Kb (gzipped ~2.5Kb)
