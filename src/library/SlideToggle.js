@@ -53,7 +53,7 @@ const util = {
   },
 };
 
-export const useSlideToggle = ({interpolateOnReverse = false,
+export default function useSlideToggle({interpolateOnReverse = false,
                                  onCollapsed = null, onUnmount = null,
                                  toggleEvent = null, expandEvent = null,
                                  collapseEvent = null, onMount = null,
@@ -65,7 +65,7 @@ export const useSlideToggle = ({interpolateOnReverse = false,
                                  offsetHeight = false,
                                  irreversible = false, collapsed = false, duration = 300,
                                  easeCollapse = easeInOutCubic,
-                                 easeExpand = easeInOutCubic}) => {
+                                 easeExpand = easeInOutCubic}) {
 
   // Internal state
   let _state_ = {
