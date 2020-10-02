@@ -55,11 +55,12 @@ const util = {
 
 import { useCallback, useState } from 'react';
 
-export default function useSlideToggle({expandableRef = null, duration = 300, initialState = TOGGLE.EXPANDED,
-                                         collapsed = false,
-                                         easeCollapse = easeInOutCubic,
-                                         easeExpand = easeInOutCubic }) {
+const useSlideToggle = ({duration = 300, initialState = TOGGLE.EXPANDED,
+                          collapsed = false,
+                          easeCollapse = easeInOutCubic,
+                          easeExpand = easeInOutCubic }) => {
 
+  const expandableRef = React.useRef();
   const [slideToggleState, setSlideToggleState] = useState({
     toggleState: initialState,
     hasReversed: false,
@@ -71,7 +72,7 @@ export default function useSlideToggle({expandableRef = null, duration = 300, in
 
   // Internal state
   let _state_ = {
-    collapsibleElement: (expandableRef != null) ? expandableRef.current : slideToggleState.expandableRef.current,
+    collapsibleElement: (expandableRef != null) ? expandableRef.current : slideToggleState.expandableRef?.current,
     toggleState: slideToggleState.toggleState
   };
 
@@ -263,5 +264,7 @@ export default function useSlideToggle({expandableRef = null, duration = 300, in
     }
   };
 
-  return [slideToggleState, toggle];
-}
+  return { expandableRef, slideToggleState, toggle };
+};
+
+export default useSlideToggle;

@@ -5,8 +5,8 @@
     "node": ">=10",
     "npm": ">=6"
   },
-  "main": "dist/bundle.min.js",
-  "unpkg": "dist/bundle.min.js",
+  "main": "dist/bundle.js",
+  "unpkg": "dist/bundle.js",
   "scripts": {
     "clean": "rimraf dist/*.*",
     "start": "webpack-dev-server --color --mode development --http --env.PORT=3333",
@@ -26,17 +26,13 @@
     "dist"
   ],
   "dependencies": {},
-  "peerDependencies": {
-    "react": "^15.x || ^16.x || ^17.x",
-    "react-dom": "^15.x || ^16.x || ^17.x"
-  },
+  "peerDependencies": {},
   "devDependencies": {
     "@babel/core": "^7.8.7",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/plugin-proposal-object-rest-spread": "^7.8.3",
     "@babel/plugin-transform-runtime": "^7.8.3",
     "@babel/preset-env": "^7.8.7",
-    "@babel/preset-react": "^7.8.3",
     "@babel/runtime": "^7.8.7",
     "@reach/component-component": "^0.8.6",
     "@storybook/addon-actions": "^5.3.14",
@@ -45,7 +41,6 @@
     "@storybook/addon-notes": "^5.3.14",
     "@storybook/addon-viewport": "^5.3.14",
     "@storybook/addons": "^5.3.14",
-    "@storybook/react": "^5.3.14",
     "@storybook/storybook-deployer": "^2.8.3",
     "@svgr/rollup": "^5.2.0",
     "autoprefixer": "^9.7.4",
@@ -78,11 +73,10 @@
     "prettier": "^1.19.1",
     "prop-types": "15.7.2",
     "raw-loader": "^4.0.0",
-    "react": "^16.13.0",
-    "react-dom": "^16.13.0",
     "rimraf": "^3.0.2",
     "rollup": "^2.0.5",
     "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-babel-minify": "^10.0.0",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-includepaths": "^0.2.3",
     "rollup-plugin-node-resolve": "^5.2.0",
@@ -91,6 +85,7 @@
     "rollup-plugin-scss": "^2.1.0",
     "rollup-plugin-strip": "^1.2.2",
     "rollup-plugin-terser": "^5.3.0",
+    "rollup-plugin-uglify-es": "^0.0.1",
     "rollup-plugin-url": "^3.0.1",
     "sass-loader": "^8.0.2",
     "style-loader": "^1.1.3",
