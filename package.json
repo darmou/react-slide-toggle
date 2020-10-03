@@ -1,6 +1,6 @@
 {
   "name": "react-slide-toggle-hooks",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "engines": {
     "node": ">=10",
     "npm": ">=6"

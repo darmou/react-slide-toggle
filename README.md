@@ -1,4 +1,4 @@
-## about
+## About
 
 Origonal version here: https://github.com/kunukn/react-slide-toggle
 Altered for React hooks by Daryl Moulder https://github.com/darmou/react-slide-toggle-hooks
@@ -12,17 +12,16 @@ https://github.com/kunukn/react-collapse
 
 - React version 16.7+
 
-## size
+## Size
 
 - UMD minified size ~7.8Kb (gzipped ~2.5Kb)
 
-## setup / local demo
+## Setup
 
 - git clone or download
 - npm install
-- npm start
 
-## info
+## Info
 
 Default easing is cubicInOut. You can reverse the toggle before the movement completes. Ease in-out works best visually when reverse toggling is to be used.
 
@@ -30,11 +29,11 @@ This should be A11Y friendly, you can test the tabindex by tabbing. The collapse
 
 JS animation is used for best animation control and possibility of adding interpolation or using advanged easing configuration which you can't with CSS alone. This triggers browser reflows on every requestAnimationFrame. If you have a very long page this might not be the best option to use.
 
-## usage example
+## Usage Example
 
 Look in App component for inspiration. Apply the styling as needed.
 
-### component example, simple - render prop
+### Component Example, Simple - React Hook
 
 ```js
 import useSliderToggle from "react-slide-toggle-hooks";
@@ -42,8 +41,8 @@ import useSliderToggle from "react-slide-toggle-hooks";
 // const useSliderToggle = require("react-slide-toggle");
 
 // Apply optional padding to .my-collapsible__content-inner
-const expandableRef = React.useRef();
-const { toggle } = useSliderToggle({expandableRef});
+
+const { expandableRef, toggle } = useSliderToggle();
 
 return (
     <div className="my-collapsible">
@@ -57,14 +56,14 @@ return (
 );
 ```
 
-### component example, simple - function as child
+### Component Example, Simple
 
 ```js
 import useSliderToggle from "react-slide-toggle-hooks";
 
 // Apply optional padding to .my-collapsible__content-inner
-const expandableRef = React.useRef();
-const { toggle } = useSliderToggle({expandableRef});
+
+const { expandableRef, toggle } = useSliderToggle();
 
 return (
     <div className="my-collapsible">
@@ -78,7 +77,7 @@ return (
 );
 ```
 
-### toggle state from outside example
+### Toggle State from Outside Example
 
 ```js
 import useSliderToggle from "react-slide-toggle-hooks";
@@ -89,9 +88,8 @@ function MyComponent = () => {
   onToggle = () => {
     this.setState({ toggleEvent: Date.now() });
   };
-  const expandableRef = React.useRef();
 
-  useSliderToggle({expandableRef, toggleEvent: onToggle});
+  const { expandableRef } = useSliderToggle({toggleEvent: onToggle});
 
   return {
     return (
@@ -115,7 +113,7 @@ function MyComponent = () => {
 }
 ```
 
-## local development
+## Local Development
 
 - git clone or download
 - npm install
