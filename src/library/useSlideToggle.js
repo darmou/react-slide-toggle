@@ -53,10 +53,20 @@ const util = {
   },
 };
 
+function usePrevious(value) {
+  const ref = React.useRef();
+  React.useEffect(() => {
+    ref.current = value;
+  });
+  return ref.current;
+}
+
+
 import { useCallback, useState } from 'react';
 
 const useSlideToggle = ({duration = 300, initialState = TOGGLE.EXPANDED,
                           collapsed = false,
+                          toggleEvent = undefined,
                           easeCollapse = easeInOutCubic,
                           easeExpand = easeInOutCubic }) => {
 
@@ -68,6 +78,8 @@ const useSlideToggle = ({duration = 300, initialState = TOGGLE.EXPANDED,
     progress: collapsed ? 0 : 1,
     expandableRef: expandableRef
   });
+
+
 
 
   // Internal state
@@ -143,6 +155,14 @@ const useSlideToggle = ({duration = 300, initialState = TOGGLE.EXPANDED,
     }
 
   }, []);
+
+  const prevEvent = usePrevious({toggleEvent});
+  React.useEffect(() => {
+    if (toggleEvent
+        && toggleEvent > prevEvent.toggleEvent) {
+      toggle();
+    }
+  }, [toggleEvent]);
 
   const getCollapsible = () => {
     return  (slideToggleState.expandableRef != null) ? slideToggleState.expandableRef.current : _state_.collapsibleElement;
