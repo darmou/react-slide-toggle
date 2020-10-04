@@ -1,11 +1,14 @@
 ## About
 
-Origonal version here: https://github.com/kunukn/react-slide-toggle
-Altered for React hooks by Daryl Moulder https://github.com/darmou/react-slide-toggle-hooks
-React version of jQuery.slideToggle. JavaScript animation where height is set on every requestAnimationFrame.
-The toggle direction can be reversed during the movement.
+Origonal version here:
+https://github.com/kunukn/react-slide-toggle
 
-If you are looking for a CSS transition based alternative, then use this instead
+Altered for React hooks by Daryl Moulder:
+https://github.com/darmou/react-slide-toggle-hooks
+
+React version of jQuery.slideToggle. JavaScript animation where height is set on every requestAnimationFrame.
+
+If you are looking for a CSS transition based alternative, then use this instead:
 https://github.com/kunukn/react-collapse
 
 ## Supported React versions
